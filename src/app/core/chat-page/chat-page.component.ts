@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import {
   AfterContentInit,
   AfterViewInit,
@@ -44,7 +45,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromApp.AppState>,
     private snapshot: ActivatedRoute,
-    private db: AngularFireDatabase
+    private db: AngularFireDatabase,
+    private location: Location
   ) {}
 
   interval = setInterval(() => {
@@ -131,5 +133,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     try {
       this.scrollBottom.nativeElement.scrollIntoView({ block: 'end' });
     } catch (err) {}
+  }
+
+  back(){
+    this.location.back();
   }
 }

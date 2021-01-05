@@ -19,7 +19,7 @@
 
 
 
-            
+
         </div> 
 
 
@@ -42,12 +42,16 @@
   <div class="row heading ">
     <div class="col-10 row">
 
-      <div class="col-1 col-md-1 heading-avatar pr-0 ">
+      <div class="col-3 col-md-1 heading-avatar pr-0 ">
+        <div class="back-button pr-3" (click)="back()">
+          <i class="fas fa-chevron-left fa-2x  " style="color: white;"></i>
+        </div>
+
         <div class="heading-avatar-icon">
           <img src="https://bootdey.com/img/Content/avatar/avatar6.png">
         </div>
       </div>
-      <div class="col-10 col-md-7 heading-name mt-1 ml-3">
+      <div class="col-9 col-md-7 heading-name mt-1 ml-md-3">
         <a class="heading-name-meta">{{chatWith.name}}
         </a>
         <span class="heading-online">Online</span>

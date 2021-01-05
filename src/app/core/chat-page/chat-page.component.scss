@@ -258,6 +258,10 @@ span {
    box-shadow: none;
  }
  
+ .back-button {
+
+  display:none;
+}
 
  @media screen and (max-width: 700px) {
 
@@ -270,10 +274,20 @@ span {
   }
   .heading-avatar {
     padding: 0 !important;
+
+    div {
+      display: inline-block;
+    }
+
+    .back-button {
+      margin-top:5px!important;
+      display:inline-block;
+    }
   }
   .heading-avatar-icon img {
     height: 30px;
     width: 30px;
+    margin-top:-5px !important
   }
   .heading-compose {
     padding: 5px !important;
