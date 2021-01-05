@@ -14,7 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Chat, Message } from 'src/app/shared/chat.model';
+import { Chat, Message, getNormalTime } from 'src/app/shared/chat.model';
 
 import * as fromApp from '../../shared/app.reducer';
 import * as chatActions from '../store/chat.actions';
@@ -67,8 +67,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    
-    this.snapshot.queryParams.pipe().subscribe((query) => { 
+    this.snapshot.queryParams.pipe().subscribe((query) => {
       this.chatUID = query.chat;
       if (this.chatUID == undefined) {
         console.log('destroy');
@@ -82,13 +81,13 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       if (query.chat) {
         this.interval;
 
-        this.messageSelected = true; 
+        this.messageSelected = true;
 
         this.store.select('chatActions').subscribe((state) => {
           this.chatWith = state.chats.find(
             (chat) => chat.groupID == this.chatUID
           );
-       
+
           this.scrollToBottom();
         });
         this.scrollToBottom();
@@ -101,17 +100,16 @@ export class ChatPageComponent implements OnInit, OnDestroy {
             map((res) => {
               let copyRes = res;
               copyRes.map((msg) => {
-                msg.sentAt = new Date(msg.sentAt);
+                msg.normalDate = getNormalTime(msg.sentAt);
               });
-           return copyRes;
+              return copyRes;
             })
           )
           .subscribe((data) => {
             this.store.dispatch(new chatActions.Seen(this.chatUID));
 
             this.messages = data;
-           
-         
+
             this.scrollToBottom();
           });
       } else {
@@ -135,7 +133,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     } catch (err) {}
   }
 
-  back(){
+  back() {
     this.location.back();
   }
 }

@@ -5,7 +5,7 @@ import { User } from 'src/app/auth/user.model';
 import * as fromApp from "../../shared/app.reducer"
 import * as AuthActions from "../../auth/auth.actions";
 import * as ChatActions from "../store/chat.actions";
-import { Chat, Invites } from 'src/app/shared/chat.model';
+import { Chat, Invites,  } from 'src/app/shared/chat.model';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
@@ -49,9 +49,9 @@ export class LeftBarComponent implements OnInit {
     })
 
     this.store.select("chatActions")
-  
+    
     .subscribe(state => {
-   
+     
      this.chats = state.chats;
      this.invitesBar = state.invites
   

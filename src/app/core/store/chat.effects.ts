@@ -5,11 +5,8 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 
 import {
-  filter,
   map,
-  mapTo,
   mergeMap,
-  reduce,
   switchMap,
   take,
   withLatestFrom,
@@ -20,6 +17,7 @@ import {
   Chat,
   InviteFromDB,
   Seens,
+  getNormalTime
 } from '../../shared/chat.model';
 
 import * as fromApp from '../../shared/app.reducer';
@@ -186,8 +184,8 @@ export class ChatEffects {
                       filtered,
                       item,
                       mySeens.length,
-                      date
-                     
+                      date,
+                      getNormalTime(date.getTime())
                     );
 
                     this.store.dispatch(new ChatActions.StoreChats(user));
