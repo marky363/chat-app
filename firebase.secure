@@ -1,0 +1,58 @@
+{
+  "rules": {
+   
+  "chat": {
+     // the list of chats may not be listed (no .read permissions here)
+     
+     // a chat conversation
+     "$key": {
+         
+         // if the chat hasn't been created yet, we allow read so there is a way 
+         // to check this and create it; if it already exists, then authenticated 
+         // user (specified by auth.id) must be in $key/users
+        ".read": "auth != null && (!data.exists() || data.child('users').hasChild(auth.id))",
+        
+        // list of users authorized xto participate in chat
+        "users": {
+           // if the list doesn't exist, anybody can create it
+           // if it already exists, only users already in the list may modify it
+           ".write": "!data.exists() || data.hasChild(auth.id)",
+           "$acc": {
+              // for now the value is just a 1, later it could be a read/write/super privilege
+              ".validate": "newData.isNumber()"
+           }
+        },
+        
+        // timestamps recording last time each user has read this chat
+        "last": {
+           "$acc": {
+              // may only written by the authenticated user and if user is in $key/users
+              ".write": "$acc === auth.id && root.child('chat/'+$key+'/users').hasChild($acc)",
+              ".validate": "newData.isNumber()"
+           }
+        },
+        
+        "messages": {
+           "$msg": {
+              // to write a message, it must have all three fields (usr, ts, and msg)
+              // and the person writing must be in $key/users
+              ".write": "root.child('chat/'+$key+'/users').hasChild(auth.id)",
+              ".validate":"newData.hasChildren(['ts', 'usr', 'msg'])",
+              "usr": {
+                 // may only create messages from myself
+                 ".validate": "newData.val() === auth.id"
+              },
+              "msg": {
+                 ".validate": "newData.isString()"
+              },
+              "ts": {
+                 ".validate": "newData.isNumber()"
+              }
+           }
+        }
+     }
+  }
+ 
+}
+  
+}

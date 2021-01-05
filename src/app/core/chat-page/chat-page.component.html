@@ -1,0 +1,113 @@
+<div class="container pt-5 mt-5  " *ngIf="!messageSelected">
+  <div class="row  text-center justify-content-center align-items-center">
+    <div class="col-12" style="width: auto;">
+
+
+
+      <form style="max-width: 300px; margin:auto">
+        <div class="form-group">
+          <label for="email">Add uid of user </label>
+          <input type="text" class="form-control" id="nick" aria-describedby="nick" placeholder="Enter ID"
+            [(ngModel)]="id" name="id">
+          <small id="emailHelp" class="form-text text-muted">Enter ID to chat</small>
+        </div>
+        <div class="form-group">
+          <label for="email">Your message </label>
+          <input type="text" class="form-control" id="message" aria-describedby="message" placeholder="Enter message"
+            [(ngModel)]="message" name="message">
+
+        </div> 
+
+
+          <button type="submit" class="btn btn-primary mt-3" (click)="sendInvite()">Send Invite</button>
+
+      </form>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+<div *ngIf="messageSelected && chatWith " style="height: 100%;">
+
+
+
+  <div class="row heading ">
+    <div class="col-10 row">
+
+      <div class="col-1 col-md-1 heading-avatar pr-0 ">
+        <div class="heading-avatar-icon">
+          <img src="https://bootdey.com/img/Content/avatar/avatar6.png">
+        </div>
+      </div>
+      <div class="col-10 col-md-7 heading-name mt-1 ml-3">
+        <a class="heading-name-meta">{{chatWith.name}}
+        </a>
+        <span class="heading-online">Online</span>
+      </div>
+    </div>
+
+    <div class="col-2 heading-dot pull-right">
+      <i class="fa fa-ellipsis-v fa-2x  pull-right" aria-hidden="true"></i>
+    </div>
+  </div>
+
+  <div class="container message pb-1 "id="conversation">
+
+   
+
+    <div class="row message-previous align-items-end">
+      <div class="col-12 previous">
+        <a (click)="addMessages(20)" id="ankitjain28" name="20">
+          Show Previous Message!
+        </a>
+      </div>
+    </div>
+
+  
+    <div class="row message-body align-self-end" *ngFor="let msg of messages; let i = index" >
+      <div class="col-12  " 
+        [ngClass]="{'message-main-receiver': chatWith.uid === msg.sentBy , 'message-main-sender': chatWith.uid !== msg.sentBy  }">
+        <div [ngClass]="{'receiver': chatWith.uid === msg.sentBy , 'sender': chatWith.uid !== msg.sentBy  }">
+          <div class="message-text">
+            {{msg.message}}
+          </div>
+          <span class="message-time pull-right">
+            {{msg.sentAt.getHours() + ":" + msg.sentAt.getMinutes() }}
+          </span>
+        </div>
+      
+      </div>
+    </div>
+   <div  #conversation class="p-1">  </div>
+
+
+
+
+
+
+  </div >
+
+
+
+
+
+
+  <div class="row reply bottom">
+    <div class="col-1 reply-emojis">
+      <i class="fa fa-smile-o fa-2x"></i>
+    </div>
+    <div class="col-10  reply-main">
+      <textarea class="form-control" rows="1" id="comment"  
+      id="msg" aria-describedby="msg" placeholder="Enter message"
+            [(ngModel)]="msg" name="msg" ></textarea>
+    </div>
+
+    <div class="col-1 reply-send">
+      <i class="fa fa-send fa-2x" aria-hidden="true" (click)="sendMessage(msg)" (keyup.enter)="sendMessage(msg)"></i>
+    </div>
+  </div>
+</div>
