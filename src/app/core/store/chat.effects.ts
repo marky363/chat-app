@@ -4,20 +4,13 @@ import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 
-import {
-  map,
-  mergeMap,
-  switchMap,
-  take,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { map, mergeMap, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import {
   Invites,
   Group,
   Chat,
-  InviteFromDB,
   Seens,
-  getNormalTime
+  getNormalTime,
 } from '../../shared/chat.model';
 
 import * as fromApp from '../../shared/app.reducer';
@@ -48,6 +41,7 @@ export class ChatEffects {
         db_grp.child('recentMessage').set({
           massageText: payload.message,
           sentBy: data.uid,
+          sentAt: date,
           seen: false,
         });
 
@@ -81,37 +75,53 @@ export class ChatEffects {
       return this.auth.user;
     }),
     map((user) => {
-      this.db
-        .list('user/' + user.uid + '/invites')
-        .valueChanges()
-        .subscribe((data) => {
-          let array: Invites[] = [];
+      let sub: Subscription;
 
-          // this.store.dispatch(new ChatActions.StoreInvites([]));
+      if (user) {
+        sub = this.db
+          .list('user/' + user.uid + '/invites')
+          .valueChanges()
+          .subscribe((dataUser) => {
+            let array: Invites[] = [];
 
-          let result = data.reduce((a, c) => {
-            let [[k, v]] = Object.entries(c);
+            let result = dataUser.reduce((a, c) => {
+              let [[k, v]] = Object.entries(c);
 
-            if (v === true) {
-              this.db
-                .object('group/' + k + '')
-                .valueChanges()
-                .subscribe((data: InviteFromDB) => {
-                  let item = {
-                    id: k,
-                    status: v,
-                    createdBy: data.createdByName,
-                    messsage: data.recentMessage.massageText,
-                  };
+              if (v === true) {
+                this.db
+                  .object('group/' + k + '')
+                  .valueChanges()
+                  .subscribe((dataGroup: Group) => {
+                    var keys = Object.keys(dataGroup.members);
+                    var filtered = keys
+                      .filter((key) => key.valueOf() !== user.uid)
+                      .toString();
+                    this.db
+                      .object<string>('user/' + filtered + '/photoUrl')
+                      .valueChanges()
+                      .subscribe((dataSecondUser) => {
+                        let invite = new Invites(
+                          k,
+                          v,
+                          dataGroup.createdByName,
+                          dataGroup.recentMessage.massageText,
+                          getNormalTime(dataGroup.recentMessage.sentAt),
+    
+                          dataSecondUser
+                        );
 
-                  array = [...array, item];
-
-                  this.store.dispatch(new ChatActions.StoreInvites(array));
-                });
-            }
-            return '';
-          }, {});
-        });
+                      
+                        this.store.dispatch(
+                          new ChatActions.StoreInvites(invite)
+                        );
+                      });
+                  });
+              }
+              return '';
+            }, {});
+          });
+      } else {
+      }
     })
   );
 
@@ -131,6 +141,8 @@ export class ChatEffects {
           .once('child_added', (data) => {
             data.ref.child(payload).set(false);
           });
+        
+        
       });
     })
   );
@@ -142,57 +154,67 @@ export class ChatEffects {
       return this.auth.user;
     }),
     map((res) => {
-      this.db
-        .list<Group>('user/' + res.uid + '/groups')
-        .valueChanges()
-        .subscribe((data) => {
-          data.forEach((item) => {
-            this.db
-              .object('group/' + item + '')
-              .valueChanges()
-              .subscribe((data: Group) => {
-                var keys = Object.keys(data.members);
-                var filtered = keys
-                  .filter((key) => key.valueOf() !== res.uid)
-                  .toString();
-                this.db
-                  .object<string>('user/' + filtered + '/displayName')
-                  .valueChanges()
-                  .pipe(
-                    mergeMap((filtered) => {
-                      return combineLatest([
-                        of(filtered),
-                        this.db
-                          .list<Seens>('message/' + item + '/messages', (ref) =>
-                            ref.orderByChild('seen').equalTo(false)
-                          )
-                          .valueChanges(),
-                      ]);
-                    })
-                  )
-                  .subscribe(([chatWith, seens]) => {
-                    var mySeens = seens.filter(
-                      (seen) => seen.sentBy == filtered
-                    );
-                    
-                    let date = new Date(data.recentMessage.sentAt)
+      let sub: Subscription;
+      if (res) {
+        sub = this.db
+          .list<Group>('user/' + res.uid + '/groups')
+          .valueChanges()
+          .subscribe((data) => {
+            data.forEach((item) => {
+              this.db
+                .object('group/' + item + '')
+                .valueChanges()
+                .subscribe((data: Group) => {
+                  var keys = Object.keys(data.members);
+                  var filtered = keys
+                    .filter((key) => key.valueOf() !== res.uid)
+                    .toString();
+                  this.db
+                    .object<string>('user/' + filtered + '/displayName')
+                    .valueChanges()
+                    .pipe(
+                      mergeMap((filteredd) => {
+                        return combineLatest([
+                          of(filteredd),
+                          this.db
+                            .list<Seens>(
+                              'message/' + item + '/messages',
+                              (ref) => ref.orderByChild('seen').equalTo(false)
+                            )
+                            .valueChanges(),
+                          this.db
+                            .object<string>('user/' + filtered + '/photoUrl')
+                            .valueChanges(),
+                        ]);
+                      })
+                    )
+                    .subscribe(([chatWith, seens, photoUrl]) => {
+                      var mySeens = seens.filter(
+                        (seen) => seen.sentBy == filtered
+                      );
 
-                    var user = new Chat(
-                      chatWith,
-                      data.recentMessage.massageText,
-                      data.recentMessage.sentBy,
-                      filtered,
-                      item,
-                      mySeens.length,
-                      date,
-                      getNormalTime(date.getTime())
-                    );
+                      let date = new Date(data.recentMessage.sentAt);
 
-                    this.store.dispatch(new ChatActions.StoreChats(user));
-                  });
-              });
+                      var user = new Chat(
+                        chatWith,
+                        data.recentMessage.massageText,
+                        data.recentMessage.sentBy,
+                        filtered,
+                        item,
+                        mySeens.length,
+                        date,
+                        getNormalTime(date.getTime()),
+                        data.recentMessage.sentAt,
+                        photoUrl
+                      );
+
+                      this.store.dispatch(new ChatActions.StoreChats(user));
+                    });
+                });
+            });
           });
-        });
+      } else {
+      }
     })
   );
 
@@ -214,7 +236,7 @@ export class ChatEffects {
       db_grp.child('recentMessage').set({
         massageText: payload.msg,
         sentBy: user.uid,
-        sentAt: date
+        sentAt: date,
       });
     })
   );
@@ -243,7 +265,6 @@ export class ChatEffects {
           })
         )
         .subscribe((res) => {
-         
           var mySeens = res.filter((seen) => seen[1].sentBy != user.uid);
 
           let i = 0;
@@ -254,7 +275,6 @@ export class ChatEffects {
               .update({
                 seen: true,
               });
-           
           });
         });
     })
@@ -265,7 +285,7 @@ export class ChatEffects {
     ofType(ChatActions.CANCEL_SUB),
     map(() => {
       if (this.sub) {
-         this.sub.unsubscribe();
+        this.sub.unsubscribe();
       }
     })
   );

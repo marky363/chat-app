@@ -1,6 +1,7 @@
 export class User {
   constructor(
      public name: string,
+     public imgURL: string,
      public id?: string,
      public _token?: string,
      public _tokenExpirationDate?: Date,

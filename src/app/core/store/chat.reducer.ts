@@ -46,10 +46,48 @@ export function AuthReducer(
       };
 
     case ChatActions.STORE_INVITES:
+
+      var orgState = [...state.invites];
+
+      if (state.invites.length == 0) {
+        orgState = [...state.invites, action.payload];
+      } else {
+        const findID = state.invites.findIndex(
+          (usr) => usr.createdBy === action.payload.createdBy
+        );
+
+        if (findID == -1) {
+          orgState = [...state.invites, action.payload];
+        } else {
+          const selectedMessage = state.invites[findID];
+          const UpdatedMessage = {
+            ...selectedMessage,
+            ...action.payload,
+          };
+          orgState = [...state.invites];
+          orgState[findID] = UpdatedMessage;
+        }
+      }
+
+     
       return {
         ...state,
-        invites: action.payload,
+        invites: orgState
       };
+
+      case ChatActions.ACCEPT_INVITE:
+
+       
+
+
+
+      return {
+        ...state,
+        invites: state.invites.filter(invites => {
+          return invites.id != action.payload
+        })
+
+      }
 
     default:
       return state;

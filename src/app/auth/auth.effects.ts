@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import * as fromApp from '../shared/app.reducer';
 import * as AuthActions from './auth.actions';
 
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, take, tap } from 'rxjs/operators';
 import { User } from './user.model';
 
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -12,10 +12,6 @@ import { AngularFireDatabase } from '@angular/fire/database';
 
 @Injectable()
 export class AuthEffects {
-
- 
-
-
   @Effect({ dispatch: false })
   SaveLoginToStorage = this.actions$.pipe(
     ofType(AuthActions.LOGIN),
@@ -25,23 +21,30 @@ export class AuthEffects {
       this.firebase
         .signInAnonymously()
         .then((user) => {
-          user.user.updateProfile({ displayName: payload.name });
+          user.user.updateProfile({
+            displayName: payload.name,
+            photoURL: payload.imgURL,
+          });
 
           user.user
             .getIdToken()
             .then((token) => {
-             let db = this.db.database.ref('user/' + user.user.uid);
-             db.child('displayName').set(payload.name);
-             db.child('groups').set("");
-             db.child('uid').set(user.user.uid)
-
+              let db = this.db.database.ref('user/' + user.user.uid);
+              db.child('displayName').set(payload.name);
+              db.child('photoUrl').set(payload.imgURL);
+              db.child('groups').set('');
+              db.child('uid').set(user.user.uid);
 
               this.store.dispatch(
-                  new AuthActions.LoginSuccess(
-                  handleAuth(payload.name, user.user.uid, token, 3600)
+                new AuthActions.LoginSuccess(
+                  handleAuth(
+                    payload.name,
+                    payload.imgURL,
+                    user.user.uid,
+                    token,
+                    3600
+                  )
                 )
-
-               
               );
             })
             .catch((error) => {
@@ -53,16 +56,17 @@ export class AuthEffects {
         });
     })
   );
- 
+
   @Effect({ dispatch: false })
   autoLogin_autoLogOut = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
-    map((type) => {
-     
-      this.firebase.user.subscribe((data) => {
+    switchMap(() => { return this.firebase.user.pipe(take(1)) }),
+    map((data) => {
+      
         if (data) {
-          //  console.log(data.uid)
-          let user = new User(data.displayName, data.uid);
+           
+
+          let user = new User(data.displayName, data.photoURL, data.uid);
           this.store.dispatch(new AuthActions.LoginSuccess(user));
 
           data.getIdTokenResult().then((data) => {
@@ -70,18 +74,15 @@ export class AuthEffects {
             var e = new Date().getTime();
             var f = d - e;
             // console.log(f)
-            autoLogout(f)
+            autoLogout(f);
           });
         }
-      });
+      
 
       function autoLogout(expirationTime: number) {
-
-      //  setTimeout(() => {
-      //    this.firebase.signOut();
-       
-       
-      //   }, expirationTime);
+        //  setTimeout(() => {
+        //    this.firebase.signOut();
+        //   }, expirationTime);
       }
     })
   );
@@ -104,13 +105,14 @@ export class AuthEffects {
 
 function handleAuth(
   displayName: string,
+  imageURL: string,
   userID: string,
   token: string,
   expiraton: number
 ) {
   const expiratonDate = new Date(new Date().getTime() + expiraton * 1000);
 
-  let user = new User(displayName, userID, token, expiratonDate);
+  let user = new User(displayName, imageURL, userID, token, expiratonDate);
 
   return user;
 }

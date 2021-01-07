@@ -1,15 +1,13 @@
 import { Location } from '@angular/common';
 import {
-  AfterContentInit,
-  AfterViewInit,
   Component,
   ElementRef,
-  OnChanges,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { of, Subscription } from 'rxjs';
@@ -18,6 +16,7 @@ import { Chat, Message, getNormalTime } from 'src/app/shared/chat.model';
 
 import * as fromApp from '../../shared/app.reducer';
 import * as chatActions from '../store/chat.actions';
+
 
 @Component({
   selector: 'app-chat-page',
@@ -57,14 +56,24 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
   }, 10);
 
-  sendMessage(msg) {
-    this.store.dispatch(
-      new chatActions.SendMessage({ msg: msg, groupID: this.chatUID })
+ 
+
+  sendMessage(f: NgForm) {
+    if(f.valid){
+     this.store.dispatch(
+      new chatActions.SendMessage({ msg: f.value.msg, groupID: this.chatUID })
     );
+    f.reset()
+    }
+     
+    
   }
   ngOnDestroy() {
     this.store.dispatch(new chatActions.CancelSub());
   }
+
+
+  
 
   ngOnInit(): void {
     this.snapshot.queryParams.pipe().subscribe((query) => {
@@ -109,6 +118,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
             this.store.dispatch(new chatActions.Seen(this.chatUID));
 
             this.messages = data;
+           
 
             this.scrollToBottom();
           });

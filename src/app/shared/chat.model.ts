@@ -4,21 +4,11 @@ export class Invites {
     public status: any,
     public createdBy?: string,
     public messsage?: string,
-    public normalDate?: string
+    public normalDate?: string,
+    public photoURL?: string,
   ) {}
 }
-export class InviteFromDB {
-  constructor(
-    public createdAt: string,
-    public createdBy: string,
-    public createdByName: string,
-    public members: {},
-    public recentMessage: {
-      massageText: string;
-      sentBy: string;
-    }
-  ) {}
-}
+
 export class Group {
   constructor(
     public createdAt: string,
@@ -29,6 +19,7 @@ export class Group {
       massageText: string;
       sentBy: string;
       sentAt: number;
+      seen: boolean;
     }
   ) {}
 }
@@ -41,7 +32,9 @@ export class Chat {
     public groupID?: any,
     public seen?: number,
     public date?: Date,
-    public normalDate?: string
+    public normalDate?: string,
+    public timestamp?: number,
+    public photoUrl?: string
   
   ) {}
 }

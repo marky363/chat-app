@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(){
     this.getScreenSize()
+    
     this.store.dispatch(new AuthActions.AutoLogin())
     this.store.select("authActions").subscribe(state => {
       this.logged = state.logged

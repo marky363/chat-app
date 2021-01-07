@@ -6,7 +6,7 @@
       
        <div class="col-2 heading-avatar float-left">
          <div class="heading-avatar-icon">
-           <img src="https://bootdey.com/img/Content/avatar/avatar1.png">
+           <img [src]="user.imgURL">
       
          </div>
          
@@ -46,7 +46,7 @@
      <div class="row sideBar-body invite" *ngFor="let invites of invitesBar"  (click)="acceptInvite(invites.id)">
       <div class="col-3 sideBar-avatar">
         <div class="avatar-icon">
-          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="">
+          <img [src]="invites.photoURL" class="">
         </div>
       </div>
       <div class="col-9 sideBar-main">
@@ -57,7 +57,7 @@
           </div>
 
           <div class="col-4 pull-right sideBar-time">
-            <span class="time-meta pull-right">18:18
+            <span class="time-meta pull-right">{{invites.normalDate}}
           </span>
           </div>
         </div>
@@ -82,7 +82,7 @@
        <div class="row sideBar-body" *ngFor="let chat of chats" (click)="openChat(chat.groupID)" >
          <div class="col-2 sideBar-avatar">
            <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="">
+             <img [src]="chat.photoUrl" class="">
            </div>
          </div>
          <div class="col-10 sideBar-main">

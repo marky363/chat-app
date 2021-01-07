@@ -20,10 +20,10 @@
 
 
 
-        </div> 
+        </div>
 
 
-          <button type="submit" class="btn btn-primary mt-3" (click)="sendInvite()">Send Invite</button>
+        <button type="submit" class="btn btn-primary mt-3" (click)="sendInvite()">Send Invite</button>
 
       </form>
 
@@ -63,9 +63,9 @@
     </div>
   </div>
 
-  <div class="container message pb-1 "id="conversation">
+  <div class="container message pb-1 " id="conversation">
 
-   
+
 
     <div class="row message-previous align-items-end">
       <div class="col-12 previous">
@@ -75,9 +75,9 @@
       </div>
     </div>
 
-  
-    <div class="row message-body align-self-end" *ngFor="let msg of messages; let i = index" >
-      <div class="col-12  " 
+
+    <div class="row message-body align-self-end" *ngFor="let msg of messages; let i = index">
+      <div class="col-12  "
         [ngClass]="{'message-main-receiver': chatWith.uid === msg.sentBy , 'message-main-sender': chatWith.uid !== msg.sentBy  }">
         <div [ngClass]="{'receiver': chatWith.uid === msg.sentBy , 'sender': chatWith.uid !== msg.sentBy  }">
           <div class="message-text">
@@ -87,17 +87,17 @@
             {{msg.normalDate}}
           </span>
         </div>
-      
+
       </div>
     </div>
-   <div  #conversation class="p-1">  </div>
+    <div #conversation class="p-1"> </div>
 
 
 
 
 
 
-  </div >
+  </div>
 
 
 
@@ -105,17 +105,25 @@
 
 
   <div class="row reply bottom">
-    <div class="col-1 reply-emojis">
+    <div class="col-2 col-md-1 reply-emojis">
       <i class="fa fa-smile-o fa-2x"></i>
     </div>
-    <div class="col-10  reply-main">
-      <textarea class="form-control" rows="1" id="comment"  
-      id="msg" aria-describedby="msg" placeholder="Enter message"
-            [(ngModel)]="msg" name="msg" ></textarea>
+    <div class="col-md-11 col-10">
+      <form class="row justify-content-between" style="width:100%" #f="ngForm" (ngSubmit)="sendMessage(f)" (keyup.enter)="sendMessage(f)">
+        <div class="col-11 reply-main">
+          <textarea class="form-control" rows="1" id="comment" id="msg" aria-describedby="msg"
+            placeholder="Enter message" ngModel name="msg" required></textarea>
+        </div>
+
+        <div class="col-1 reply-send">
+           <button style="border:none" [disabled]="!f.valid">
+                <i class="fa fa-send fa-2x" aria-hidden="true" ></i>
+           </button>
+       
+        </div>
+      </form>
     </div>
 
-    <div class="col-1 reply-send">
-      <i class="fa fa-send fa-2x" aria-hidden="true" (click)="sendMessage(msg)" (keyup.enter)="sendMessage(msg)"></i>
-    </div>
+
   </div>
 </div>

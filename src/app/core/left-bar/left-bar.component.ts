@@ -40,6 +40,14 @@ export class LeftBarComponent implements OnInit {
 
   constructor(private store: Store<fromApp.AppState>, private router: Router) { }
 
+  sortBy(prop: Chat[] ){
+    var list = prop.slice().sort((x,y) => {
+      
+      return y.timestamp - x.timestamp
+    })
+   return list
+  }
+
   ngOnInit(): void {
 
    
@@ -52,10 +60,10 @@ export class LeftBarComponent implements OnInit {
     
     .subscribe(state => {
      
-     this.chats = state.chats;
+     this.chats = this.sortBy(state.chats);
      this.invitesBar = state.invites
   
-
+     
 
      
     })

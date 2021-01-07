@@ -30,7 +30,7 @@ export class RecieveInvites implements Action {
 export class StoreInvites implements Action {
    readonly type = STORE_INVITES;
 
-   constructor(public payload: Invites[]){}
+   constructor(public payload: Invites){}
 }
 
 
@@ -66,4 +66,4 @@ export class CancelSub implements Action {
    readonly type = CANCEL_SUB
 }
 
-export type ChatActions = StartChat  | RecieveInvites | StoreInvites | StoreChats 
+export type ChatActions = StartChat  | RecieveInvites | StoreInvites | StoreChats  | AcceptInvite
