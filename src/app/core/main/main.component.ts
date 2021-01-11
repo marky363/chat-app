@@ -42,4 +42,8 @@ export class MainComponent implements OnInit {
     }
   }
   ngOnInit(): void {}
+
+  googleLogin(){
+    this.store.dispatch(new AuthActions.LoginGoogle())
+  }
 }

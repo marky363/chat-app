@@ -328,6 +328,8 @@ span {
  }
  .reply {
    height: 50px;
+   position:sticky;
+   bottom: 0;
  }
  .reply-emojis {
    padding: 4px 0 !important;

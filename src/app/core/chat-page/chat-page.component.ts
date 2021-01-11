@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -45,7 +45,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     private store: Store<fromApp.AppState>,
     private snapshot: ActivatedRoute,
     private db: AngularFireDatabase,
-    private location: Location
+    private router: Router
   ) {}
 
   interval = setInterval(() => {
@@ -79,7 +79,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.snapshot.queryParams.pipe().subscribe((query) => {
       this.chatUID = query.chat;
       if (this.chatUID == undefined) {
-        console.log('destroy');
+       
         this.store.dispatch(new chatActions.CancelSub());
       }
 
@@ -128,15 +128,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  id: string;
-  message: string;
-
-  sendInvite() {
-    this.store.dispatch(
-      new chatActions.StartChat({ id: this.id, message: this.message })
-    );
-  }
-
+ 
   scrollToBottom(): void {
     try {
       this.scrollBottom.nativeElement.scrollIntoView({ block: 'end' });
@@ -144,6 +136,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   back() {
-    this.location.back();
+    this.router.navigate([""])
   }
 }

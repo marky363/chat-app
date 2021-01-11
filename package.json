@@ -1,6 +1,6 @@
 {
   "name": "chat",
-  "version": "0.0.0",
+  "version": "1.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -26,8 +26,9 @@
     "@ngrx/store": "^10.1.0",
     "@ngrx/store-devtools": "^10.1.0",
     "bootstrap": "^4.5.3",
-    "firebase": "^8.2.0",
+    "firebase": "^8.2.2",
     "rxjs": "~6.5.5",
+    "subsink": "^1.0.2",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
   },

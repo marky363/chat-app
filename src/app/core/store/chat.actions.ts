@@ -66,4 +66,4 @@ export class CancelSub implements Action {
    readonly type = CANCEL_SUB
 }
 
-export type ChatActions = StartChat  | RecieveInvites | StoreInvites | StoreChats  | AcceptInvite
+export type ChatActions = StartChat  | RecieveInvites | StoreInvites | StoreChats  | AcceptInvite | CancelSub

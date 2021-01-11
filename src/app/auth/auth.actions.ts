@@ -2,6 +2,9 @@ import {Action } from '@ngrx/store'
 import { User } from './user.model'
 
 export const LOGIN = '[Auth] - Loggin User'
+export const LOGIN_GOOGLE = '[Auth] - Loggin User from GoogleAcc'
+
+
 export const LOGIN_SUCCESS = '[Auth] - Loggin User Success'
 export const AUTO_LOGIN = '[Auth] - Auto Logging User'
 export const LOGOUT = '[Auth] - Logged Out'
@@ -22,6 +25,12 @@ export class LoginSuccess implements Action {
    readonly type = LOGIN_SUCCESS
 
    constructor(public payload: User){}
+}
+
+export class LoginGoogle implements Action {
+   readonly type = LOGIN_GOOGLE
+
+   
 }
 
 export type AuthActions = Login | AutoLogin | LogOut | LoginSuccess

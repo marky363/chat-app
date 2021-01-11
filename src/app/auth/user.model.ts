@@ -3,8 +3,9 @@ export class User {
      public name: string,
      public imgURL: string,
      public id?: string,
+     public _tokenExpirationDate?: any,
      public _token?: string,
-     public _tokenExpirationDate?: Date,
+     
   ) {}
 
   get token(){

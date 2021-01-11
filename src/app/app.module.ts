@@ -18,12 +18,14 @@ import {AuthEffects} from "./auth/auth.effects";
 import { ChatEffects } from "./core/store/chat.effects"
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+
 import { AngularFireModule } from '@angular/fire';
 
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 
-import {ChatService} from "./core/chat.service"
+import {ChatService} from "./core/chat.service";
+import { NewchatComponent } from './core/left-bar/newchat/newchat.component'
 
 const config = {
   apiKey: "AIzaSyDp4tO6mImjWmzizmI-Y5y-MXV7E_Igu7Q",
@@ -41,7 +43,8 @@ const config = {
     AppComponent,
     LeftBarComponent,
     ChatPageComponent,
-    MainComponent
+    MainComponent,
+    NewchatComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +57,8 @@ const config = {
 
     AngularFireModule.initializeApp(config),
     AngularFireAuthModule, 
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+  
   ],
   providers: [ChatService],
   bootstrap: [AppComponent]

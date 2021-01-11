@@ -16,16 +16,21 @@ import {
 import * as fromApp from '../../shared/app.reducer';
 import * as ChatActions from '../store/chat.actions';
 import { combineLatest, concat, of, Subscription } from 'rxjs';
+import { SubSink } from 'subsink';
 
 @Injectable()
 export class ChatEffects {
+
+  private subs = new SubSink();
+
+
   @Effect({ dispatch: false })
   sendInvite = this.actions$.pipe(
     ofType(ChatActions.SEND_INVITE_TO_CHAT),
     map((action: ChatActions.StartChat) => action.payload),
     map((payload) => {
       this.auth.user.subscribe((data) => {
-        console.log(payload.id);
+        
         var conversationId = createConversationId(data.uid, payload.id);
 
         let date = Date.now();
@@ -75,11 +80,11 @@ export class ChatEffects {
       return this.auth.user;
     }),
     map((user) => {
-      let sub: Subscription;
+
 
       if (user) {
-        sub = this.db
-          .list('user/' + user.uid + '/invites')
+        this.subs.sink = this.db
+          .list('user/' + user.uid + '/invites') //third
           .valueChanges()
           .subscribe((dataUser) => {
             let array: Invites[] = [];
@@ -88,7 +93,7 @@ export class ChatEffects {
               let [[k, v]] = Object.entries(c);
 
               if (v === true) {
-                this.db
+                this.subs.sink =  this.db
                   .object('group/' + k + '')
                   .valueChanges()
                   .subscribe((dataGroup: Group) => {
@@ -96,7 +101,7 @@ export class ChatEffects {
                     var filtered = keys
                       .filter((key) => key.valueOf() !== user.uid)
                       .toString();
-                    this.db
+                      this.subs.sink =  this.db
                       .object<string>('user/' + filtered + '/photoUrl')
                       .valueChanges()
                       .subscribe((dataSecondUser) => {
@@ -106,11 +111,10 @@ export class ChatEffects {
                           dataGroup.createdByName,
                           dataGroup.recentMessage.massageText,
                           getNormalTime(dataGroup.recentMessage.sentAt),
-    
+
                           dataSecondUser
                         );
 
-                      
                         this.store.dispatch(
                           new ChatActions.StoreInvites(invite)
                         );
@@ -135,17 +139,17 @@ export class ChatEffects {
         db_usr.push(payload);
 
         this.db.database
-          .ref('user/' + user.uid + '/invites')
+          .ref('user/' + user.uid + '/invites') 
           .orderByChild(payload)
           .equalTo(true)
           .once('child_added', (data) => {
             data.ref.child(payload).set(false);
           });
-        
-        
       });
     })
   );
+
+
 
   @Effect({ dispatch: false })
   recieveGroups = this.actions$.pipe(
@@ -154,23 +158,23 @@ export class ChatEffects {
       return this.auth.user;
     }),
     map((res) => {
-      let sub: Subscription;
+     
       if (res) {
-        sub = this.db
-          .list<Group>('user/' + res.uid + '/groups')
+        this.subs.sink = this.db
+          .list<Group>('user/' + res.uid + '/groups') //forth
           .valueChanges()
           .subscribe((data) => {
             data.forEach((item) => {
-              this.db
-                .object('group/' + item + '')
+              this.subs.sink =  this.db
+                .object('group/' + item + '') //second
                 .valueChanges()
                 .subscribe((data: Group) => {
                   var keys = Object.keys(data.members);
                   var filtered = keys
                     .filter((key) => key.valueOf() !== res.uid)
                     .toString();
-                  this.db
-                    .object<string>('user/' + filtered + '/displayName')
+                  this.subs.sink =  this.db
+                    .object<string>('user/' + filtered + '/displayName') //first 
                     .valueChanges()
                     .pipe(
                       mergeMap((filteredd) => {
@@ -255,27 +259,33 @@ export class ChatEffects {
         .pipe(
           take(1),
           map((res) => {
-            var key = Object.entries(res);
-            var items;
+            if (res != null) {
+              var key = Object.entries(res);
+              var items;
 
-            items = key.filter((data) => {
-              return data[1].seen === false;
-            });
-            return items;
+              items = key.filter((data) => {
+                return data[1].seen === false;
+              });
+              return items;
+            } else {
+              return res;
+            }
           })
         )
         .subscribe((res) => {
-          var mySeens = res.filter((seen) => seen[1].sentBy != user.uid);
+          if (res != null) {
+            var mySeens = res.filter((seen) => seen[1].sentBy != user.uid);
 
-          let i = 0;
+            let i = 0;
 
-          mySeens.forEach((seen, index) => {
-            this.db.database
-              .ref('message/' + payload + '/messages/' + seen[0])
-              .update({
-                seen: true,
-              });
-          });
+            mySeens.forEach((seen, index) => {
+              this.db.database
+                .ref('message/' + payload + '/messages/' + seen[0])
+                .update({
+                  seen: true,
+                });
+            });
+          }
         });
     })
   );
@@ -284,9 +294,9 @@ export class ChatEffects {
   cancelSub = this.actions$.pipe(
     ofType(ChatActions.CANCEL_SUB),
     map(() => {
-      if (this.sub) {
-        this.sub.unsubscribe();
-      }
+      this.subs.unsubscribe()
+
+     
     })
   );
 

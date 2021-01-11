@@ -1,330 +1,132 @@
+<div class="side-one">
+  <div class="row heading d-flex">
+    <div class="col-2 heading-avatar float-left">
+      <div class="heading-avatar-icon pt-1 pt-sm-0">
+        <img [src]="user.imgURL" />
+      </div>
+    </div>
+    <div class="col-6 pt-2  pr-0 display-name" style="font-size: .9rem; margin-top: 3px;">
+      {{ user.name }}
+    </div>
 
-   <div class="side-one">
-     <div class="row heading d-flex ">
-      
+    <div class="col-4 pt-1 px-0 float-right icons">
+      <div class="heading-dot float-right" ngbDropdown container="body">
+        <i ngbDropdownToggle class="fa fa-ellipsis-v fa-2x pull-right" aria-hidden="true"></i>
 
-      
-       <div class="col-2 heading-avatar float-left">
-         <div class="heading-avatar-icon">
-           <img [src]="user.imgURL">
-      
-         </div>
-         
-       </div>
-       <div class="col-6 pt-2 display-name ">
-       {{user.name}}
-       </div>
-      
-
-       <div class="col-4 pt-1 px-0 float-right icons">
-         <div class="heading-dot  float-right" ngbDropdown container="body">
-        
-        
-          <i ngbDropdownToggle class="fa fa-ellipsis-v fa-2x  pull-right" aria-hidden="true"></i>
-        
-          
-         <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right" style="height:auto; width: auto;" >
-      
-          <a ngbDropdownItem href="#" (click)="$event.preventDefault()">action</a>
+        <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right" style="height: auto; width: auto">
+          <a ngbDropdownItem (click)="$event.preventDefault() || openModal(info)">Info</a>
           <div class="dropdown-divider"></div>
           <a ngbDropdownItem href="#" (click)="$event.preventDefault() || logout()">Logout</a>
         </div>
-        
-       </div>
-       <div class="heading-compose  float-right" >
-        <a [routerLink]="['/']" >
-         <i class="fa fa-comments fa-2x  pull-right" aria-hidden="true"></i>
+      </div>
+      <div class="heading-compose float-right">
+        <a (click)="expandSecondBar()">
+          <i class="fa fa-comments fa-2x pull-right" aria-hidden="true"></i>
         </a>
-       </div>
-       </div>
-       
-       
-     </div>
-     <div class="col-12 p-2 text-center text-muted" style="font-size: .8rem;" >{{user.id}} </div>
-     <div class="col-12 p-2 text-center text-muted" style="font-size: .8rem;" *ngIf="invitesBar.length > 0">You have <b>{{invitesBar.length}} </b> invites to chat</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 p-2 text-center text-muted" style="font-size: 0.8rem">
+    {{ user.id }}
+  </div>
+  <div class="col-12 p-2 text-center text-muted" style="font-size: 0.8rem" *ngIf="invitesBar.length > 0">
+    You have <b>{{ invitesBar.length }} </b> invites to chat
+  </div>
 
-     <div class="row sideBar-body invite" *ngFor="let invites of invitesBar"  (click)="acceptInvite(invites.id)">
-      <div class="col-3 sideBar-avatar">
-        <div class="avatar-icon">
-          <img [src]="invites.photoURL" class="">
+  <div class="row sideBar-body invite" *ngFor="let invites of invitesBar" (click)="acceptInvite(invites.id)">
+    <div class="col-3 sideBar-avatar">
+      <div class="avatar-icon">
+        <img [src]="invites.photoURL" class="" />
+      </div>
+    </div>
+    <div class="col-9 sideBar-main">
+      <div class="row h-100">
+        <div class="col-8 sideBar-name">
+          <span class="name-meta">{{ invites.createdBy }}</span>
+          <div class="newMessage-meta" style="font-size: 0.8rem; color: #414141">
+            {{ invites.messsage }}
+          </div>
+        </div>
+
+        <div class="col-4 pull-right sideBar-time">
+          <span class="time-meta pull-right">{{ invites.normalDate }} </span>
         </div>
       </div>
-      <div class="col-9 sideBar-main">
-        <div class="row h-100">
-          <div class="col-8 sideBar-name">
-            <span class="name-meta">{{invites.createdBy}}</span>
-            <div class="newMessage-meta" style="font-size: .8rem; color:#414141;" >{{invites.messsage}}</div>
+    </div>
+  </div>
+
+  <div class="row searchBox">
+    <div class="col-12 searchBox-inner">
+      <div class="form-group has-feedback">
+        <input id="searchText" type="text" class="form-control" name="searchText" placeholder="Search" />
+        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container sideBar">
+    <div class="row sideBar-body" *ngFor="let chat of chats" (click)="openChat(chat.groupID)">
+      <div class="col-2 sideBar-avatar">
+        <div class="avatar-icon">
+          <img [src]="chat.photoUrl" class="" />
+        </div>
+      </div>
+      <div class="col-10 sideBar-main">
+        <div class="row h-100 padding">
+          <div class="col-10 sideBar-name">
+            <span class="name-meta">{{ chat.name }}</span>
+            <div class="newMessage">
+              <span class="mySend" *ngIf="chat.sentBy != chat.uid"> </span>
+              {{ chat.lastMessage }}
+            </div>
           </div>
 
-          <div class="col-4 pull-right sideBar-time">
-            <span class="time-meta pull-right">{{invites.normalDate}}
-          </span>
+          <div class="col-2 pull-right sideBar-time">
+            <span class="time-meta pull-right">{{ chat.normalDate }} <br />
+              <span class="badge badge-danger" *ngIf="chat.seen > 0">{{
+                chat.seen
+                }}</span>
+            </span>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="side-two" [ngClass]="{ show: secondBar }">
+  <div class="row newMessage-heading">
+    <div class="row newMessage-main">
+      <div class="col-2 newMessage-back" (click)="expandSecondBar()">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+      </div>
+      <div class="col-9 newMessage-title">New Chat</div>
+    </div>
+  </div>
+
+  <div class="container compose-sideBar">
+    <app-newchat></app-newchat>
+  </div>
+</div>
 
 
-     <div class="row searchBox">
-       <div class="col-12 searchBox-inner">
-         <div class="form-group has-feedback">
-           <input id="searchText" type="text" class="form-control" name="searchText" placeholder="Search">
-           <span class="glyphicon glyphicon-search form-control-feedback"></span>
-         </div>
-       </div>
-     </div>
-
-     <div class="container sideBar">
-
-      
-
-
-       <div class="row sideBar-body" *ngFor="let chat of chats" (click)="openChat(chat.groupID)" >
-         <div class="col-2 sideBar-avatar">
-           <div class="avatar-icon">
-             <img [src]="chat.photoUrl" class="">
-           </div>
-         </div>
-         <div class="col-10 sideBar-main">
-           <div class="row h-100 padding">
-             <div class="col-10 sideBar-name">
-               <span class="name-meta">{{chat.name}}</span>
-               <div class="newMessage" ><span class="mySend" *ngIf="chat.sentBy != chat.uid"> </span> {{chat.lastMessage}} </div>
-             </div>
-
-             <div class="col-2 pull-right sideBar-time">
-               <span class="time-meta pull-right">{{chat.normalDate }} <br>
-                <span class="badge badge-danger" *ngIf="chat.seen > 0">{{chat.seen}}</span>
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-    
-
+<ng-template #info let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">How to use chat app</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <h2> Welcome in the Chat-App by Mark v1.2</h2>
+    <p> - For open new chat press message button <br>
+        - Type there ID of second user and start chatting <br>
+        - Enjoy ! 
        
-     
-     
-      
-     </div>
-   </div>
-
-
-
-
-
-   <div class="side-two">
-     <div class="row newMessage-heading">
-       <div class="row newMessage-main">
-         <div class="col-2 newMessage-back">
-           <i class="fa fa-arrow-left" aria-hidden="true"></i>
-         </div>
-         <div class="col-10 newMessage-title">
-           New Chat
-         </div>
-       </div>
-     </div>
-
-     <div class="row composeBox">
-       <div class="col-12 composeBox-inner">
-         <div class="form-group has-feedback">
-           <input id="composeText" type="text" class="form-control" name="searchText" placeholder="Search People">
-           <span class="glyphicon glyphicon-search form-control-feedback"></span>
-         </div>
-       </div>
-     </div>
-
-     <div class="row compose-sideBar">
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar1.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar2.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar3.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar4.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar5.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar6.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar2.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar3.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar4.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-       <div class="row sideBar-body">
-         <div class="col-3 col-3 sideBar-avatar">
-           <div class="avatar-icon">
-             <img src="https://bootdey.com/img/Content/avatar/avatar5.png">
-           </div>
-         </div>
-         <div class="col-9 col-9 sideBar-main">
-           <div class="row">
-             <div class="col-8 col-8 sideBar-name">
-               <span class="name-meta">John Doe
-             </span>
-             </div>
-             <div class="col-4 col-4 pull-right sideBar-time">
-               <span class="time-meta pull-right">18:18
-             </span>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
+    </p>
+    <p> 
+      - Bug and improvements comment here: <br>
+      <a href="https://github.com/marky363/chat-app">https://github.com/marky363/chat-app</a>
+    </p>
+  </div>
+</ng-template>
